@@ -1,16 +1,25 @@
 package delivery
 
-import "net/url"
+import (
+	"net/url"
+	"strings"
+)
 
 func createImageAddress(link string) (*url.URL, error) {
 
-	parsed, err := url.Parse(link)
+	trimmedLink := strings.TrimLeft(link, "/")
+
+	joinedPath, err := url.JoinPath("https://", trimmedLink)
 
 	if err != nil {
 		return nil, err
 	}
 
-	parsed.Scheme = "https"
+	parsed, err := url.Parse(joinedPath)
+
+	if err != nil {
+		return nil, err
+	}
 
 	return parsed, nil
 }
