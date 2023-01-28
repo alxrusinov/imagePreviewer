@@ -1,7 +1,6 @@
 package client
 
 import (
-	"fmt"
 	"io"
 	"net/http"
 	"net/url"
@@ -25,8 +24,6 @@ func (cl *Client) GetWithHeaders(url *url.URL, header http.Header) ([]byte, erro
 		return nil, err
 	}
 	defer resp.Body.Close()
-
-	fmt.Println("HEADER", resp.Header)
 
 	buf, err := io.ReadAll(resp.Body)
 

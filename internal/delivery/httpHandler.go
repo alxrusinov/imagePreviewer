@@ -1,6 +1,7 @@
 package delivery
 
 import (
+	"fmt"
 	"github.com/alxrusinov/imagePreviewer/internal/client"
 	"github.com/alxrusinov/imagePreviewer/internal/service"
 	"github.com/gin-gonic/gin"
@@ -62,5 +63,8 @@ func (handler *HttpHandler) FillHandler(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, cropped)
+	fileName := createFileName(link, widthParam, heightParam)
+
+	ctx.Header("Content-Disposition", fmt.Sprintf("attachment; filename=\"%s\"", fileName))
+	ctx.Data(http.StatusOK, "image/jpg", cropped)
 }

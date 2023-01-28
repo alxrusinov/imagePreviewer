@@ -1,6 +1,12 @@
 package service
 
-import "github.com/alxrusinov/imagePreviewer/internal/repository"
+import (
+	"bytes"
+	"github.com/alxrusinov/imagePreviewer/internal/repository"
+	"github.com/disintegration/imaging"
+	"image"
+	"image/jpeg"
+)
 
 type CropperService struct {
 	repo repository.Repo
@@ -11,7 +17,26 @@ func NewCropperService(repo repository.Repo) *CropperService {
 }
 
 func (crp *CropperService) Fill(img []byte, params *CropperParams) ([]byte, error) {
-	return nil, nil
+
+	imgReader := bytes.NewReader(img)
+
+	originalImg, _, err := image.Decode(imgReader)
+
+	if err != nil {
+		return nil, err
+	}
+
+	croppedImg := imaging.Fill(originalImg, params.Width, params.Height, imaging.Center, imaging.Lanczos)
+
+	buf := new(bytes.Buffer)
+
+	err = jpeg.Encode(buf, croppedImg, nil)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return buf.Bytes(), nil
 }
 
 type CropperParams struct {
