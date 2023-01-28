@@ -3,6 +3,7 @@ package delivery
 import (
 	"fmt"
 	"github.com/alxrusinov/imagePreviewer/internal/client"
+	"github.com/alxrusinov/imagePreviewer/internal/repository"
 	"github.com/alxrusinov/imagePreviewer/internal/service"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -19,7 +20,6 @@ func NewHttpHandler(services *service.Services, client *client.Client) *HttpHand
 }
 
 func (handler *HttpHandler) FillHandler(ctx *gin.Context) {
-
 	width := ctx.Param("width")
 	height := ctx.Param("height")
 	link := ctx.Param("link")
@@ -54,6 +54,19 @@ func (handler *HttpHandler) FillHandler(ctx *gin.Context) {
 		return
 	}
 
+	rawUrl := ctx.Request.URL.String()
+
+	result, ok := handler.Services.CropperService.GetByUrl(repository.Key(rawUrl))
+
+	if ok {
+		fmt.Println("GET FROM CACHE", ok)
+		fileName := createFileName(link, widthParam, heightParam)
+
+		ctx.Header("Content-Disposition", fmt.Sprintf("attachment; filename=\"%s\"", fileName))
+		ctx.Data(http.StatusOK, "image/jpg", result)
+		return
+	}
+
 	cropperParams := service.NewCropperParams(link, widthParam, heightParam)
 
 	cropped, err := handler.Services.CropperService.Fill(img, cropperParams)
@@ -62,6 +75,8 @@ func (handler *HttpHandler) FillHandler(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": ImageProcessingError.Error()})
 		return
 	}
+
+	_ = handler.Services.CropperService.SaveToCache(repository.Key(rawUrl), cropped)
 
 	fileName := createFileName(link, widthParam, heightParam)
 

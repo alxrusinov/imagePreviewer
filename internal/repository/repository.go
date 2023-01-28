@@ -1,6 +1,9 @@
 package repository
 
+type Key string
+
 type Repo interface {
-	Save() error
-	Get() error
+	Set(key Key, value interface{}) bool
+	Get(key Key) (interface{}, bool)
+	Clear()
 }

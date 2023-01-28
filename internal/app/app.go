@@ -3,17 +3,20 @@ package app
 import (
 	"github.com/alxrusinov/imagePreviewer/internal/client"
 	"github.com/alxrusinov/imagePreviewer/internal/delivery"
-	"github.com/alxrusinov/imagePreviewer/internal/repository"
+	"github.com/alxrusinov/imagePreviewer/internal/repository/lru"
 	"github.com/alxrusinov/imagePreviewer/internal/routes"
 	"github.com/alxrusinov/imagePreviewer/internal/service"
 	"github.com/gin-gonic/gin"
 	"log"
 )
 
+const DefaultCap = 10
+
 func Run() {
 	httpClient := client.NewClient()
 
-	repo := repository.NewLRU()
+	// TODO: Add config later
+	repo := lru.NewCache(DefaultCap)
 	cropperService := service.NewCropperService(repo)
 	services := service.NewServices(cropperService)
 	handler := delivery.NewHttpHandler(services, httpClient)
