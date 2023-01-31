@@ -59,7 +59,6 @@ func (handler *HttpHandler) FillHandler(ctx *gin.Context) {
 	result, ok := handler.Services.CropperService.GetByUrl(repository.Key(rawUrl))
 
 	if ok {
-		fmt.Println("GET FROM CACHE", ok)
 		fileName := createFileName(link, widthParam, heightParam)
 
 		ctx.Header("Content-Disposition", fmt.Sprintf("attachment; filename=\"%s\"", fileName))

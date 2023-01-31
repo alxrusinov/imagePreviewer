@@ -2,7 +2,6 @@ package service
 
 import (
 	"bytes"
-	"fmt"
 	"github.com/alxrusinov/imagePreviewer/internal/repository"
 	"github.com/disintegration/imaging"
 	"image"
@@ -42,8 +41,6 @@ func (crp *CropperService) Fill(img []byte, params *CropperParams) ([]byte, erro
 
 func (crp *CropperService) GetByUrl(rawUrl repository.Key) ([]byte, bool) {
 	result, exist := crp.repo.Get(rawUrl)
-
-	fmt.Printf("EXiST - %t\n, %s\n, %#v\n", exist, rawUrl, crp.repo)
 
 	if !exist {
 		return nil, exist
