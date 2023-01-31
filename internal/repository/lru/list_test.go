@@ -60,4 +60,39 @@ func TestList(t *testing.T) {
 		l.Remove(item) // [10, 30]
 		require.Equal(t, 3, l.Len())
 	})
+
+	t.Run("pushback to empty list", func(t *testing.T) {
+		l := NewList()
+
+		l.PushBack(10) // [10]
+
+		require.Equal(t, 1, l.Len())
+	})
+
+	t.Run("remove head element from list with len == 1", func(t *testing.T) {
+		l := NewList()
+
+		l.PushFront(10) // [10]
+
+		head := l.Front()
+		l.Remove(head)
+
+		require.Equal(t, 0, l.Len())
+
+	})
+
+	t.Run("remove head element from list with len > 1", func(t *testing.T) {
+		l := NewList()
+
+		l.PushFront(10) // [10]
+		l.PushBack(20)  // [10, 20]
+		l.PushBack(30)  // [10, 20, 30]
+
+		head := l.Front()
+
+		l.Remove(head)
+
+		require.Equal(t, 1, l.Len())
+
+	})
 }

@@ -1,6 +1,9 @@
 package lru
 
-import "github.com/alxrusinov/imagePreviewer/internal/repository"
+import (
+	"github.com/alxrusinov/imagePreviewer/internal/repository"
+	"sync"
+)
 
 type Cache interface {
 	Set(key repository.Key, value interface{}) bool
@@ -12,10 +15,13 @@ type lruCache struct {
 	capacity int
 	queue    List
 	items    map[repository.Key]*ListItem
+	mu       *sync.Mutex
 }
 
 func (l *lruCache) Set(key repository.Key, value interface{}) bool {
 	isKeyExist := false
+	l.mu.Lock()
+	defer l.mu.Unlock()
 	if elem, ok := l.items[key]; ok {
 		elem.Value.(item).setValue(value)
 		l.queue.MoveToFront(l.items[key])
@@ -32,10 +38,13 @@ func (l *lruCache) Set(key repository.Key, value interface{}) bool {
 			l.items[key] = l.queue.PushFront(elem)
 		}
 	}
+
 	return isKeyExist
 }
 
 func (l *lruCache) Get(key repository.Key) (interface{}, bool) {
+	l.mu.Lock()
+	defer l.mu.Unlock()
 	if elem, ok := l.items[key]; ok {
 		l.queue.MoveToFront(elem)
 		return elem.Value.(item).getValue(), true
@@ -80,5 +89,6 @@ func NewCache(capacity int) Cache {
 		capacity: capacity,
 		queue:    NewList(),
 		items:    make(map[repository.Key]*ListItem, capacity),
+		mu:       &sync.Mutex{},
 	}
 }
