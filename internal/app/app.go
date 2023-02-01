@@ -27,7 +27,7 @@ func Run() {
 
 	api.POST(routes.FILL, handler.FillHandler)
 
-	err := router.Run(":3000")
+	err := router.Run("0.0.0.0:80")
 
 	if err != nil {
 		log.Fatalln(err)

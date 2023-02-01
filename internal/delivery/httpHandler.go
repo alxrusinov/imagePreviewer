@@ -50,7 +50,7 @@ func (handler *HttpHandler) FillHandler(ctx *gin.Context) {
 	img, err := handler.Client.GetWithHeaders(imageAddress, header)
 
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": ReadImageError.Error()})
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Errorf("%s: %w", ReadImageError.Error(), err).Error()})
 		return
 	}
 

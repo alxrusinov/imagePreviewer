@@ -7,7 +7,7 @@ docker_build:
 	docker build . -t image-previewer
 
 docker_run:
-	docker run -p 80:3000 --name image-previewer image-previewer:latest
+	docker run -p 80:80 --name image-previewer image-previewer:latest
 
 docker_container_clean:
 	docker rm image-previewer
