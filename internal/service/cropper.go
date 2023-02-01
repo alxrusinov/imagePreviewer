@@ -23,7 +23,7 @@ func (crp *CropperService) Fill(img []byte, params *CropperParams) ([]byte, erro
 	originalImg, _, err := image.Decode(imgReader)
 
 	if err != nil {
-		return nil, err
+		return nil, DecodeImageError
 	}
 
 	croppedImg := imaging.Fill(originalImg, params.Width, params.Height, imaging.Center, imaging.Lanczos)
@@ -33,7 +33,7 @@ func (crp *CropperService) Fill(img []byte, params *CropperParams) ([]byte, erro
 	err = jpeg.Encode(buf, croppedImg, nil)
 
 	if err != nil {
-		return nil, err
+		return nil, EncodeImageError
 	}
 
 	return buf.Bytes(), nil

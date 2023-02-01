@@ -5,12 +5,6 @@ import (
 	"sync"
 )
 
-type Cache interface {
-	Set(key repository.Key, value interface{}) bool
-	Get(key repository.Key) (interface{}, bool)
-	Clear()
-}
-
 type lruCache struct {
 	capacity int
 	queue    List
@@ -84,7 +78,7 @@ func newCacheItem(key repository.Key, value interface{}) *cacheItem {
 	return &cacheItem{key: key, value: value}
 }
 
-func NewCache(capacity int) Cache {
+func NewCache(capacity int) repository.Repo {
 	return &lruCache{
 		capacity: capacity,
 		queue:    NewList(),

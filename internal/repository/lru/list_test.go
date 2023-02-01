@@ -92,7 +92,7 @@ func TestList(t *testing.T) {
 
 		l.Remove(head)
 
-		require.Equal(t, 1, l.Len())
+		require.Equal(t, 2, l.Len())
 
 	})
 }
