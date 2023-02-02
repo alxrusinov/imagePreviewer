@@ -3,8 +3,8 @@ package delivery
 import "errors"
 
 var (
-	BadParamsError        = errors.New("bad params width/height")
-	BadParsedAddressError = errors.New("incorrect url for source file")
-	ReadImageError        = errors.New("reading image error")
-	ImageProcessingError  = errors.New("image processing is not possible")
+	ErrBadParams        = errors.New("bad params width/height")
+	ErrBadParsedAddress = errors.New("incorrect url for source file")
+	ErrReadImage        = errors.New("reading image error")
+	ErrImageProcessing  = errors.New("image processing is not possible")
 )

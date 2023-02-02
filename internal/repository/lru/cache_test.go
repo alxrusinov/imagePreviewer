@@ -1,12 +1,12 @@
 package lru
 
 import (
-	"github.com/alxrusinov/imagePreviewer/internal/repository"
 	"math/rand"
 	"strconv"
 	"sync"
 	"testing"
 
+	"github.com/alxrusinov/imagePreviewer/internal/repository"
 	"github.com/stretchr/testify/require"
 )
 

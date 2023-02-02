@@ -78,7 +78,6 @@ func TestList(t *testing.T) {
 		l.Remove(head)
 
 		require.Equal(t, 0, l.Len())
-
 	})
 
 	t.Run("remove head element from list with len > 1", func(t *testing.T) {
@@ -93,6 +92,5 @@ func TestList(t *testing.T) {
 		l.Remove(head)
 
 		require.Equal(t, 2, l.Len())
-
 	})
 }

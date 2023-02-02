@@ -2,61 +2,58 @@ package delivery
 
 import (
 	"fmt"
+	"net/http"
+	"strconv"
+
 	"github.com/alxrusinov/imagePreviewer/internal/client"
 	"github.com/alxrusinov/imagePreviewer/internal/repository"
 	"github.com/alxrusinov/imagePreviewer/internal/service"
 	"github.com/gin-gonic/gin"
-	"net/http"
-	"strconv"
 )
 
-type HttpHandler struct {
+type HTTPHandler struct {
 	Services *service.Services
 	Client   *client.Client
 }
 
-func NewHttpHandler(services *service.Services, client *client.Client) *HttpHandler {
-	return &HttpHandler{Services: services, Client: client}
+func NewHTTPHandler(services *service.Services, client *client.Client) *HTTPHandler {
+	return &HTTPHandler{Services: services, Client: client}
 }
 
-func (handler *HttpHandler) FillHandler(ctx *gin.Context) {
+func (handler *HTTPHandler) FillHandler(ctx *gin.Context) {
 	width := ctx.Param("width")
 	height := ctx.Param("height")
 	link := ctx.Param("link")
 
 	widthParam, err := strconv.Atoi(width)
-
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": BadParamsError.Error()})
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": ErrBadParams.Error()})
 		return
 	}
 
 	heightParam, err := strconv.Atoi(height)
-
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": BadParamsError.Error()})
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": ErrBadParams.Error()})
 		return
 	}
 
 	imageAddress, err := createImageAddress(link)
-
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": BadParsedAddressError.Error()})
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": ErrBadParsedAddress.Error()})
 		return
 	}
 
 	header := ctx.Request.Header.Clone()
 
 	img, err := handler.Client.GetWithHeaders(imageAddress, header)
-
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Errorf("%s: %w", ReadImageError.Error(), err).Error()})
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Errorf("%s: %w", ErrReadImage.Error(), err).Error()})
 		return
 	}
 
-	rawUrl := ctx.Request.URL.String()
+	rawURL := ctx.Request.URL.String()
 
-	result, ok := handler.Services.CropperService.GetByUrl(repository.Key(rawUrl))
+	result, ok := handler.Services.CropperService.GetByURL(repository.Key(rawURL))
 
 	if ok {
 		fileName := createFileName(link, widthParam, heightParam)
@@ -69,13 +66,12 @@ func (handler *HttpHandler) FillHandler(ctx *gin.Context) {
 	cropperParams := service.NewCropperParams(link, widthParam, heightParam)
 
 	cropped, err := handler.Services.CropperService.Fill(img, cropperParams)
-
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": ImageProcessingError.Error()})
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": ErrImageProcessing.Error()})
 		return
 	}
 
-	_ = handler.Services.CropperService.SaveToCache(repository.Key(rawUrl), cropped)
+	_ = handler.Services.CropperService.SaveToCache(repository.Key(rawURL), cropped)
 
 	fileName := createFileName(link, widthParam, heightParam)
 

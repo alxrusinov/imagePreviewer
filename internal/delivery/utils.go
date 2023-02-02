@@ -7,17 +7,14 @@ import (
 )
 
 func createImageAddress(link string) (*url.URL, error) {
-
 	trimmedLink := strings.TrimLeft(link, "/")
 
 	joinedPath, err := url.JoinPath("https://", trimmedLink)
-
 	if err != nil {
 		return nil, err
 	}
 
 	parsed, err := url.Parse(joinedPath)
-
 	if err != nil {
 		return nil, err
 	}
@@ -42,5 +39,4 @@ func createFileName(link string, width, height int) string {
 	result := fmt.Sprintf("%s_%dx%d.%s", name, width, height, extension)
 
 	return result
-
 }

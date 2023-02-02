@@ -1,8 +1,9 @@
 package lru
 
 import (
-	"github.com/alxrusinov/imagePreviewer/internal/repository"
 	"sync"
+
+	"github.com/alxrusinov/imagePreviewer/internal/repository"
 )
 
 type lruCache struct {

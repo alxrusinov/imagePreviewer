@@ -1,4 +1,3 @@
 package entity
 
-type Cropper struct {
-}
+type Cropper struct{}

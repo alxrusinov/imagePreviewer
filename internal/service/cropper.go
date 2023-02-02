@@ -2,10 +2,11 @@ package service
 
 import (
 	"bytes"
-	"github.com/alxrusinov/imagePreviewer/internal/repository"
-	"github.com/disintegration/imaging"
 	"image"
 	"image/jpeg"
+
+	"github.com/alxrusinov/imagePreviewer/internal/repository"
+	"github.com/disintegration/imaging"
 )
 
 type CropperService struct {
@@ -17,11 +18,9 @@ func NewCropperService(repo repository.Repo) *CropperService {
 }
 
 func (crp *CropperService) Fill(img []byte, params *CropperParams) ([]byte, error) {
-
 	imgReader := bytes.NewReader(img)
 
 	originalImg, _, err := image.Decode(imgReader)
-
 	if err != nil {
 		return nil, DecodeImageError
 	}
@@ -39,8 +38,8 @@ func (crp *CropperService) Fill(img []byte, params *CropperParams) ([]byte, erro
 	return buf.Bytes(), nil
 }
 
-func (crp *CropperService) GetByUrl(rawUrl repository.Key) ([]byte, bool) {
-	result, exist := crp.repo.Get(rawUrl)
+func (crp *CropperService) GetByURL(rawURL repository.Key) ([]byte, bool) {
+	result, exist := crp.repo.Get(rawURL)
 
 	if !exist {
 		return nil, exist
