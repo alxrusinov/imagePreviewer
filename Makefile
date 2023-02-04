@@ -11,3 +11,14 @@ docker_run:
 
 docker_container_clean:
 	docker rm image-previewer
+
+nginx_build:
+	docker build . -f Dockerfile.nginx -t nginx
+
+nginx_run:
+	docker run -p 80:80  --name nginx nginx:latest
+
+nginx_stop:
+	docker stop nginx
+	docker rm nginx
+	docker rmi nginx
