@@ -9,7 +9,7 @@ import (
 func createImageAddress(link string) (*url.URL, error) {
 	trimmedLink := strings.TrimLeft(link, "/")
 
-	joinedPath, err := url.JoinPath("https://", trimmedLink)
+	joinedPath, err := url.JoinPath("http://", trimmedLink)
 	if err != nil {
 		return nil, err
 	}

@@ -1,24 +1,16 @@
-up:	docker_build docker_run
+build:
+	docker-compose build
 
 run:
-	go run 'cmd/app/main.go'
+	docker-compose up
 
-docker_build:
-	docker build . -t image-previewer
+lint:
+	golangci-lint run
 
-docker_run:
-	docker run -p 80:80 --name image-previewer image-previewer:latest
+test:
+	go test -v -race -count 1 ./...
 
-docker_container_clean:
-	docker rm image-previewer
-
-nginx_build:
-	docker build . -f Dockerfile.nginx -t nginx
-
-nginx_run:
-	docker run -p 80:80  --name nginx nginx:latest
-
-nginx_stop:
-	docker stop nginx
-	docker rm nginx
-	docker rmi nginx
+test_api:
+	docker-compose -f ./docker-compose.test.yml up -d
+	go test -v --tags=integration ./integration/test/...
+	docker-compose -f ./docker-compose.test.yml down

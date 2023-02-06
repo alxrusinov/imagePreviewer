@@ -27,13 +27,13 @@ func (handler *HTTPHandler) FillHandler(ctx *gin.Context) {
 
 	widthParam, err := strconv.Atoi(width)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": ErrBadParams.Error()})
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": ErrBadParams.Error()})
 		return
 	}
 
 	heightParam, err := strconv.Atoi(height)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": ErrBadParams.Error()})
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": ErrBadParams.Error()})
 		return
 	}
 
@@ -47,7 +47,7 @@ func (handler *HTTPHandler) FillHandler(ctx *gin.Context) {
 
 	img, err := handler.Client.GetWithHeaders(imageAddress, header)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Errorf("%s: %w", ErrReadImage.Error(), err).Error()})
+		ctx.JSON(http.StatusBadGateway, gin.H{"error": fmt.Errorf("%s: %w", ErrReadImage.Error(), err).Error()})
 		return
 	}
 
@@ -59,6 +59,7 @@ func (handler *HTTPHandler) FillHandler(ctx *gin.Context) {
 		fileName := createFileName(link, widthParam, heightParam)
 
 		ctx.Header("Content-Disposition", fmt.Sprintf("attachment; filename=\"%s\"", fileName))
+		ctx.Header("Content-Length", fmt.Sprintf("%d", len(result)))
 		ctx.Data(http.StatusOK, "image/jpg", result)
 		return
 	}
@@ -76,5 +77,6 @@ func (handler *HTTPHandler) FillHandler(ctx *gin.Context) {
 	fileName := createFileName(link, widthParam, heightParam)
 
 	ctx.Header("Content-Disposition", fmt.Sprintf("attachment; filename=\"%s\"", fileName))
+	ctx.Header("Content-Length", fmt.Sprintf("%d", len(cropped)))
 	ctx.Data(http.StatusOK, "image/jpg", cropped)
 }

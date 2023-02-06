@@ -1,7 +1,10 @@
 package app
 
 import (
+	"fmt"
 	"log"
+	"os"
+	"strconv"
 
 	"github.com/alxrusinov/imagePreviewer/internal/client"
 	"github.com/alxrusinov/imagePreviewer/internal/delivery"
@@ -11,13 +14,28 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-const DefaultCap = 10
+const (
+	DefaultCacheSize = 10
+	DefaultPort      = "80"
+)
 
 func Run() {
+	port := DefaultPort
+	cacheSize := DefaultCacheSize
+
+	if portEnv, exist := os.LookupEnv("PORT"); exist {
+		port = portEnv
+	}
+
+	if cacheEnv, exist := os.LookupEnv("CACHE"); exist {
+		if size, err := strconv.Atoi(cacheEnv); err == nil {
+			cacheSize = size
+		}
+	}
+
 	httpClient := client.NewClient()
 
-	// TODO: Add config later
-	repo := lru.NewCache(DefaultCap)
+	repo := lru.NewCache(cacheSize)
 	cropperService := service.NewCropperService(repo)
 	services := service.NewServices(cropperService)
 	handler := delivery.NewHTTPHandler(services, httpClient)
@@ -26,10 +44,11 @@ func Run() {
 
 	api := router.Group("fill")
 
-	api.POST(routes.FILL, handler.FillHandler)
+	api.GET(routes.FILL, handler.FillHandler)
 
-	err := router.Run("0.0.0.0:80")
-	if err != nil {
+	addr := fmt.Sprintf("0.0.0.0:%s", port)
+
+	if err := router.Run(addr); err != nil {
 		log.Fatalln(err)
 	}
 }

@@ -1,7 +1,8 @@
 package lru
 
 import (
-	"math/rand"
+	"crypto/rand"
+	"math/big"
 	"strconv"
 	"sync"
 	"testing"
@@ -118,7 +119,8 @@ func TestCacheMultithreading(t *testing.T) {
 	go func() {
 		defer wg.Done()
 		for i := 0; i < 1_000_000; i++ {
-			c.Get(repository.Key(strconv.Itoa(rand.Intn(1_000_000))))
+			random, _ := rand.Int(rand.Reader, big.NewInt(1_000_000))
+			c.Get(repository.Key(strconv.FormatInt(random.Int64(), 10)))
 		}
 	}()
 
