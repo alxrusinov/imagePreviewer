@@ -1,5 +1,5 @@
 build:
-	docker-compose build
+	go build -o imagePreviewr cmd/app/main.go
 
 run:
 	docker-compose up
