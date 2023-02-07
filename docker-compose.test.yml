@@ -1,0 +1,27 @@
+version: "3.8"
+services:
+  server:
+    container_name: servercompose
+    environment:
+      - PORT=3000
+      - CACHE=5
+    build:
+      context: .
+      dockerfile: ./Dockerfile.test
+    ports:
+      - "3000:3000"
+    links:
+      - nginx
+    networks:
+      - network
+  nginx:
+    container_name: nginxcompose
+    build: ./nginx
+    ports:
+      - "80:80"
+    networks:
+      - network
+networks:
+  network:
+    driver: bridge
+

@@ -1,0 +1,8 @@
+version: "3.8"
+services:
+  server:
+    build: ./
+    command:
+      - server
+    ports:
+      - "80:80"

@@ -1,0 +1,89 @@
+package lru
+
+import (
+	"sync"
+
+	"github.com/alxrusinov/imagePreviewer/internal/repository"
+)
+
+type lruCache struct {
+	capacity int
+	queue    List
+	items    map[repository.Key]*ListItem
+	mu       *sync.Mutex
+}
+
+func (l *lruCache) Set(key repository.Key, value interface{}) bool {
+	isKeyExist := false
+	l.mu.Lock()
+	defer l.mu.Unlock()
+	if elem, ok := l.items[key]; ok {
+		elem.Value.(item).setValue(value)
+		l.queue.MoveToFront(l.items[key])
+		isKeyExist = true
+	} else {
+		elem := newCacheItem(key, value)
+		if l.capacity == l.queue.Len() {
+			lastElem := l.queue.Back()
+			lastKey := lastElem.Value.(item).getKey()
+			l.queue.Remove(lastElem)
+			delete(l.items, lastKey)
+			l.items[key] = l.queue.PushFront(elem)
+		} else {
+			l.items[key] = l.queue.PushFront(elem)
+		}
+	}
+
+	return isKeyExist
+}
+
+func (l *lruCache) Get(key repository.Key) (interface{}, bool) {
+	l.mu.Lock()
+	defer l.mu.Unlock()
+	if elem, ok := l.items[key]; ok {
+		l.queue.MoveToFront(elem)
+		return elem.Value.(item).getValue(), true
+	}
+	return nil, false
+}
+
+func (l *lruCache) Clear() {
+	l.queue = NewList()
+	l.items = make(map[repository.Key]*ListItem, l.capacity)
+}
+
+type cacheItem struct {
+	key   repository.Key
+	value interface{}
+}
+
+type item interface {
+	getValue() interface{}
+	getKey() repository.Key
+	setValue(v interface{})
+}
+
+func (c *cacheItem) getValue() interface{} {
+	return c.value
+}
+
+func (c *cacheItem) getKey() repository.Key {
+	return c.key
+}
+
+func (c *cacheItem) setValue(v interface{}) {
+	c.value = v
+}
+
+func newCacheItem(key repository.Key, value interface{}) *cacheItem {
+	return &cacheItem{key: key, value: value}
+}
+
+func NewCache(capacity int) repository.Repo {
+	return &lruCache{
+		capacity: capacity,
+		queue:    NewList(),
+		items:    make(map[repository.Key]*ListItem, capacity),
+		mu:       &sync.Mutex{},
+	}
+}
